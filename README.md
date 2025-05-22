@@ -117,5 +117,93 @@ Secara keseluruhan, tahap feature engineering ini berhasil menyederhanakan dan m
 
 # Modelling
 
+1. Data dibagi menjadi data latih dan data uji.
 
+2. Benchmark dilakukan pada 5 model: Linear Regression, KNN, Decision Tree, Random Forest, dan XGBoost.
+
+3. Evaluasi menggunakan metrik RMSE, MAE, dan MAPE.
+
+4. XGBoost menjadi model terbaik dari benchmarking awal, lalu dibandingkan lagi dengan model boosting lainnya: AdaBoost, LightGBM, dan CatBoost.
+
+5. CatBoost unggul pada data uji, karena kemampuannya menangani banyak fitur kategorikal secara langsung.
+
+Dilanjutkan dengan hyperparameter tuning menggunakan RandomizedSearchCV (20 iterasi dari 432 kombinasi), dipilih untuk efisiensi waktu dan resource.
+
+**Evaluasi**
+
+Scatter plot Actual vs Predicted menunjukkan pola linear positif, menandakan model memahami hubungan antara fitur dan harga.
+
+Error offset yang dipilih sebesar ±20%:
+
+Prediksi akurat pada mobil harga rendah.
+
+Error meningkat pada mobil mahal (>300.000 SAR), kemungkinan karena data mobil mahal sangat sedikit di dataset.
+
+**Top Feature**
+
+- Engine_Size (remainder__Engine_Size) → Fitur paling berpengaruh. Artinya, ukuran mesin mobil adalah indikator kuat dalam menentukan harga mobil bekas.
+- Year (remainder__Year) → Semakin baru tahun produksinya, biasanya harga semakin tinggi. Ini juga masuk akal secara bisnis.
+- Options (ordinal_options__Options) dan Mileage juga cukup penting: →Banyak fitur tambahan (Options) dan jarak tempuh (Mileage) sering dikaitkan langsung dengan kondisi dan daya tarik mobil.
+- Make (binary_large_Make_2) → Beberapa produsen mobil juga menjadi salah satu feature terpenting dalam menentukan harga mobil bekas.
+
+# Conclusion
+
+Model prediksi harga mobil bekas di Arab Saudi berhasil dibangun menggunakan CatBoost Regressor, dengan performa terbaik setelah dibandingkan dengan berbagai model lainnya.
+
+**Top Feature**
+Berdasarkan analisis feature importance, fitur paling berpengaruh terhadap harga adalah:
+
+- Engine Size
+= Year
+- Make (hasil encoding)
+- Options
+- Mileage
+
+**Kegunaan Model**
+- Membantu penjual dan pembeli menentukan harga wajar mobil bekas secara objektif.
+- Mengurangi risiko underpricing dan overpricing.
+- Visualisasi prediksi vs aktual serta batas error ±20% meningkatkan kepercayaan pengguna terhadap hasil prediksi.
+
+**Evaluasi Performa**
+- RMSE: 33,449.61 SAR → menunjukkan ada beberapa prediksi meleset cukup jauh (outlier).
+- MAE: 16,113.83 SAR → rata-rata selisih absolut antar prediksi dan harga aktual.
+- MAPE: 24.61% → rata-rata kesalahan prediksi terhadap harga aktual.
+
+MAPE sebesar 24.61% masih berada dalam kisaran umum selisih harga di pasar (10–30%), namun masih dapat dioptimalkan. Model masih bisa ditingkatkan melalui:
+- Hyperparameter tuning lanjutan
+- Penambahan fitur baru
+- Pembersihan data dari anomali berdasarkan domain knowledge
+
+# Recommendation
+
+1. **A/B Testing Model**  
+   Lakukan perbandingan performa setelah tuning parameter atau perbaikan data dengan metrik RMSE, MAE, dan MAPE.
+
+2. **Perluas Fitur Saat Pengumpulan Data**  
+   Tambahkan fitur penting seperti:
+   - Kondisi mobil  
+   - Riwayat kecelakaan dan servis  
+   - Kepemilikan (tangan ke berapa)  
+   - Warna, fitur paket premium, dll.  
+   Fitur-fitur ini dapat dikonfirmasi melalui konsultasi dengan ahli di bidang jual-beli mobil.
+
+3. **Eksplorasi Kegunaan Lain Model**
+   - Estimasi depresiasi mobil per tahun  
+   - Rekomendasi harga iklan  
+   - Deteksi harga tidak wajar (untuk mencegah penipuan atau salah pasang harga)
+
+4. **Kelayakan Penggunaan**
+   - Untuk estimasi kasual oleh pengguna umum, model sudah layak digunakan.  
+   - Untuk **penggunaan komersial (dealer/reseller/platform e-commerce)**, model perlu:
+     - Ditingkatkan akurasinya (MAPE < 20%)
+     - Ditambahkan fitur relevan
+     - Dilatih ulang secara berkala dengan data terbaru  
+     
+   Hal ini penting untuk menjaga **trust customer**, karena prediksi yang tidak akurat justru dapat menurunkan kepercayaan terhadap sistem.
+
+5. **Perbaikan pada Segmen Mobil Mahal (>300,000 SAR)**  
+   Kesalahan terbesar ditemukan pada segmen ini. Untuk mengatasi:
+   - Tambah jumlah data pada mobil premium
+   - Tambah fitur khusus seperti "luxury package", "imported", atau "accident history"
+   - Evaluasi apakah ada variabel penting yang belum terekam dalam dataset
    
